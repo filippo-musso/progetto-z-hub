@@ -14,6 +14,7 @@ import {
 import { MODULES, ADMIN_NAV, TOP_NAV, SUPPORT_NAV } from "@/config/modules";
 import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
+import logoAsset from "@/assets/logo.png.asset.json";
 
 export function AppSidebar() {
   const { state } = useSidebar();
@@ -27,13 +28,15 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-3">
-          <div className="h-8 w-8 rounded-md bg-sidebar-primary flex items-center justify-center text-sidebar-primary-foreground font-bold text-sm shrink-0">
-            WA
-          </div>
+          <img
+            src={logoAsset.url}
+            alt="Logo"
+            className="h-8 w-8 object-contain shrink-0 bg-white rounded-md p-0.5"
+          />
           {!collapsed && (
             <div className="min-w-0">
               <div className="text-sm font-semibold text-sidebar-foreground truncate">
-                Web App
+                Progetto Z
               </div>
               <div className="text-[11px] text-sidebar-foreground/60 truncate">
                 Gestione operativa
