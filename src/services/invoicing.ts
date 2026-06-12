@@ -51,7 +51,7 @@ export async function startInvoicing(params: InvoicingParams): Promise<string> {
       date_from: params.dateFrom,
       date_to: params.dateTo,
       deposit_number: params.depositNumber || null,
-      extra_charges: params.charges,
+      extra_charges: params.charges as unknown as never,
       status: "running",
     })
     .select("id")
