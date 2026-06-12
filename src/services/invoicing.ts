@@ -105,7 +105,7 @@ export async function getInvoicingJob(id: string): Promise<InvoicingJob | null> 
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
-  return data as InvoicingJob | null;
+  return data as unknown as InvoicingJob | null;
 }
 
 export async function listInvoicingJobs(limit = 20): Promise<InvoicingJob[]> {
@@ -115,5 +115,5 @@ export async function listInvoicingJobs(limit = 20): Promise<InvoicingJob[]> {
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return (data ?? []) as InvoicingJob[];
+  return (data ?? []) as unknown as InvoicingJob[];
 }
