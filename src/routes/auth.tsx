@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { t } from "@/i18n";
+import logoAsset from "@/assets/logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -44,10 +45,12 @@ function AuthPage() {
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[hsl(var(--brand-dark))] to-[hsl(var(--brand))] p-4"
       style={{ background: "linear-gradient(135deg, var(--brand-dark), var(--brand))" }}>
       <Card className="w-full max-w-md shadow-2xl">
-        <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg mb-2">
-            WA
-          </div>
+        <CardHeader className="space-y-2 text-center">
+          <img
+            src={logoAsset.url}
+            alt="Logo"
+            className="mx-auto h-20 w-20 object-contain"
+          />
           <CardTitle className="text-2xl">{t("app.name")}</CardTitle>
           <CardDescription>{t("auth.subtitle")}</CardDescription>
         </CardHeader>
