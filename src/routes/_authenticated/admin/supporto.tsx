@@ -18,10 +18,15 @@ function AdminSupportPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("support_requests")
-        .select("*, profile:profiles!support_requests_user_id_fkey(username, full_name)")
+        .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      const ids = Array.from(new Set((data ?? []).map((r) => r.user_id)));
+      const { data: profs } = ids.length
+        ? await supabase.from("profiles").select("id, username, full_name").in("id", ids)
+        : { data: [] as { id: string; username: string; full_name: string | null }[] };
+      const map = new Map((profs ?? []).map((p) => [p.id, p]));
+      return (data ?? []).map((r) => ({ ...r, profile: map.get(r.user_id) ?? null }));
     },
   });
 
