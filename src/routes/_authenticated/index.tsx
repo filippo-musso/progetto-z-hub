@@ -17,12 +17,17 @@ function HomePage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Ciao{user?.profile.full_name ? `, ${user.profile.full_name.split(" ")[0]}` : ""} 👋
-        </h1>
-        <p className="text-muted-foreground mt-1">Benvenuto nella tua area di lavoro</p>
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--gradient-brand)] p-8 text-primary-foreground shadow-[var(--shadow-glow)]">
+        <div className="absolute -top-16 -right-16 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-white/5 blur-2xl" />
+        <div className="relative">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+            Ciao{user?.profile.full_name ? `, ${user.profile.full_name.split(" ")[0]}` : ""} 👋
+          </h1>
+          <p className="text-primary-foreground/80 mt-2">Benvenuto nella tua area di lavoro</p>
+        </div>
       </div>
+
 
       {/* Widgets */}
       <section>
