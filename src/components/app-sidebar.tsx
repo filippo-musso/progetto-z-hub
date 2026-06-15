@@ -27,12 +27,10 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-2 px-2 py-3">
-          <img
-            src={logoAsset.url}
-            alt="Logo"
-            className="h-8 w-8 object-contain shrink-0 bg-white rounded-md p-0.5"
-          />
+        <div className="flex items-center gap-2.5 px-2 py-3">
+          <div className="h-9 w-9 shrink-0 rounded-xl bg-[var(--gradient-brand)] p-1.5 shadow-[var(--shadow-md)] flex items-center justify-center">
+            <img src={logoAsset.url} alt="Logo" className="h-full w-full object-contain" />
+          </div>
           {!collapsed && (
             <div className="min-w-0">
               <div className="text-sm font-semibold text-sidebar-foreground truncate">
@@ -45,6 +43,7 @@ export function AppSidebar() {
           )}
         </div>
       </SidebarHeader>
+
 
       <SidebarContent>
         <SidebarGroup>
