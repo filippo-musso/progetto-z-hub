@@ -13,8 +13,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSupportoRouteImport } from './routes/_authenticated/supporto'
-import { Route as AuthenticatedNuovoCostoTrasportoRouteImport } from './routes/_authenticated/nuovo-costo-trasporto'
 import { Route as AuthenticatedFatturazioneRouteImport } from './routes/_authenticated/fatturazione'
+import { Route as AuthenticatedCostoTrasportoRouteImport } from './routes/_authenticated/costo-trasporto'
 import { Route as AuthenticatedAdminUtentiRouteImport } from './routes/_authenticated/admin/utenti'
 import { Route as AuthenticatedAdminSupportoRouteImport } from './routes/_authenticated/admin/supporto'
 
@@ -37,16 +37,16 @@ const AuthenticatedSupportoRoute = AuthenticatedSupportoRouteImport.update({
   path: '/supporto',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedNuovoCostoTrasportoRoute =
-  AuthenticatedNuovoCostoTrasportoRouteImport.update({
-    id: '/nuovo-costo-trasporto',
-    path: '/nuovo-costo-trasporto',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedFatturazioneRoute =
   AuthenticatedFatturazioneRouteImport.update({
     id: '/fatturazione',
     path: '/fatturazione',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCostoTrasportoRoute =
+  AuthenticatedCostoTrasportoRouteImport.update({
+    id: '/costo-trasporto',
+    path: '/costo-trasporto',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminUtentiRoute =
@@ -65,16 +65,16 @@ const AuthenticatedAdminSupportoRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/costo-trasporto': typeof AuthenticatedCostoTrasportoRoute
   '/fatturazione': typeof AuthenticatedFatturazioneRoute
-  '/nuovo-costo-trasporto': typeof AuthenticatedNuovoCostoTrasportoRoute
   '/supporto': typeof AuthenticatedSupportoRoute
   '/admin/supporto': typeof AuthenticatedAdminSupportoRoute
   '/admin/utenti': typeof AuthenticatedAdminUtentiRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/costo-trasporto': typeof AuthenticatedCostoTrasportoRoute
   '/fatturazione': typeof AuthenticatedFatturazioneRoute
-  '/nuovo-costo-trasporto': typeof AuthenticatedNuovoCostoTrasportoRoute
   '/supporto': typeof AuthenticatedSupportoRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/supporto': typeof AuthenticatedAdminSupportoRoute
@@ -84,8 +84,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/costo-trasporto': typeof AuthenticatedCostoTrasportoRoute
   '/_authenticated/fatturazione': typeof AuthenticatedFatturazioneRoute
-  '/_authenticated/nuovo-costo-trasporto': typeof AuthenticatedNuovoCostoTrasportoRoute
   '/_authenticated/supporto': typeof AuthenticatedSupportoRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/supporto': typeof AuthenticatedAdminSupportoRoute
@@ -96,16 +96,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/costo-trasporto'
     | '/fatturazione'
-    | '/nuovo-costo-trasporto'
     | '/supporto'
     | '/admin/supporto'
     | '/admin/utenti'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/costo-trasporto'
     | '/fatturazione'
-    | '/nuovo-costo-trasporto'
     | '/supporto'
     | '/'
     | '/admin/supporto'
@@ -114,8 +114,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/costo-trasporto'
     | '/_authenticated/fatturazione'
-    | '/_authenticated/nuovo-costo-trasporto'
     | '/_authenticated/supporto'
     | '/_authenticated/'
     | '/_authenticated/admin/supporto'
@@ -157,18 +157,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupportoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/nuovo-costo-trasporto': {
-      id: '/_authenticated/nuovo-costo-trasporto'
-      path: '/nuovo-costo-trasporto'
-      fullPath: '/nuovo-costo-trasporto'
-      preLoaderRoute: typeof AuthenticatedNuovoCostoTrasportoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/fatturazione': {
       id: '/_authenticated/fatturazione'
       path: '/fatturazione'
       fullPath: '/fatturazione'
       preLoaderRoute: typeof AuthenticatedFatturazioneRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/costo-trasporto': {
+      id: '/_authenticated/costo-trasporto'
+      path: '/costo-trasporto'
+      fullPath: '/costo-trasporto'
+      preLoaderRoute: typeof AuthenticatedCostoTrasportoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/utenti': {
@@ -189,8 +189,8 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCostoTrasportoRoute: typeof AuthenticatedCostoTrasportoRoute
   AuthenticatedFatturazioneRoute: typeof AuthenticatedFatturazioneRoute
-  AuthenticatedNuovoCostoTrasportoRoute: typeof AuthenticatedNuovoCostoTrasportoRoute
   AuthenticatedSupportoRoute: typeof AuthenticatedSupportoRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminSupportoRoute: typeof AuthenticatedAdminSupportoRoute
@@ -198,8 +198,8 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCostoTrasportoRoute: AuthenticatedCostoTrasportoRoute,
   AuthenticatedFatturazioneRoute: AuthenticatedFatturazioneRoute,
-  AuthenticatedNuovoCostoTrasportoRoute: AuthenticatedNuovoCostoTrasportoRoute,
   AuthenticatedSupportoRoute: AuthenticatedSupportoRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminSupportoRoute: AuthenticatedAdminSupportoRoute,

@@ -37,11 +37,11 @@ export const MODULES: ModuleDef[] = [
     status: "active",
   },
   {
-    id: "nuovo-costo-trasporto",
-    label: "Nuovo costo trasporto",
+    id: "costo-trasporto",
+    label: "Costo trasporto",
     description: "Calcola il costo di un trasporto per regione e deposito",
     icon: Truck,
-    to: "/nuovo-costo-trasporto",
+    to: "/costo-trasporto",
     status: "active",
   },
   {

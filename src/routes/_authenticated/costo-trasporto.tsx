@@ -6,9 +6,8 @@ import {
   type OpzioniSpedizione,
   type CalcolaTariffaResponse,
   calcolaTutti,
-  calcolaCostoCliente,
+  calcolaCostoClienteDettaglio,
   DEPOSITI_MOCK,
-  pesoTassabile,
 } from "@/services/transport";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,17 +26,18 @@ import {
   Building2,
   TrendingUp,
   Sparkles,
+  Info,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/nuovo-costo-trasporto")({
-  component: NuovoCostoTrasportoPage,
+export const Route = createFileRoute("/_authenticated/costo-trasporto")({
+  component: CostoTrasportoPage,
 });
 
 const fmtEUR = (n: number) =>
   n.toLocaleString("it-IT", { style: "currency", currency: "EUR" });
 
-function NuovoCostoTrasportoPage() {
+function CostoTrasportoPage() {
   const [peso, setPeso] = useState<string>("");
   const [regione, setRegione] = useState<Regione | "">("");
   const [cap, setCap] = useState("");
@@ -56,17 +56,15 @@ function NuovoCostoTrasportoPage() {
   });
 
   const [risultati, setRisultati] = useState<CalcolaTariffaResponse[] | null>(null);
-  const [inputUsato, setInputUsato] = useState<{
-    regione: Regione;
-    deposito?: string;
-  } | null>(null);
+  const [cliente, setCliente] = useState<ReturnType<typeof calcolaCostoClienteDettaglio>>(null);
+  const [depositoCercato, setDepositoCercato] = useState<string | null>(null);
   const [preventivo, setPreventivo] = useState<string>("");
 
   const canCalc = peso && Number(peso) > 0 && regione;
 
   function handleCalc() {
     if (!canCalc) return;
-    const r = calcolaTutti({
+    const input = {
       pesoKg: Number(peso),
       regione: regione as Regione,
       cap: cap || undefined,
@@ -74,12 +72,11 @@ function NuovoCostoTrasportoPage() {
       provincia: provincia || undefined,
       codiceDeposito: codiceDeposito || undefined,
       opzioni,
-    });
+    };
+    const r = calcolaTutti(input);
     setRisultati(r);
-    setInputUsato({
-      regione: regione as Regione,
-      deposito: codiceDeposito.trim() || undefined,
-    });
+    setCliente(calcolaCostoClienteDettaglio(input));
+    setDepositoCercato(codiceDeposito.trim() || null);
     setPreventivo("");
   }
 
@@ -88,21 +85,22 @@ function NuovoCostoTrasportoPage() {
     return risultati.reduce((a, b) => (a.costo_totale <= b.costo_totale ? a : b));
   }, [risultati]);
 
-  const cliente =
-    inputUsato?.deposito && miglior
-      ? calcolaCostoCliente(miglior.costo_totale, inputUsato.deposito)
-      : null;
-
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Truck className="h-6 w-6 text-primary" />
-          Nuovo costo trasporto
-        </h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Confronta le tariffe dei vettori e calcola il costo al cliente
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Truck className="h-6 w-6 text-primary" />
+            Costo trasporto
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Confronta le tariffe dei vettori e calcola il costo al cliente
+          </p>
+        </div>
+        <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 bg-muted/60 rounded-md px-2.5 py-1.5">
+          <Info className="h-3.5 w-3.5" />
+          Tutti i prezzi sono IVA esclusa
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-[420px_1fr] gap-6 items-start">
@@ -258,7 +256,7 @@ function NuovoCostoTrasportoPage() {
             <Button
               onClick={handleCalc}
               disabled={!canCalc}
-              className="w-full bg-[var(--gradient-brand)] shadow-[var(--shadow-md)] h-11"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-[var(--shadow-md)] h-11 font-semibold"
               size="lg"
             >
               <Calculator className="h-4 w-4 mr-2" />
@@ -274,10 +272,10 @@ function NuovoCostoTrasportoPage() {
           ) : (
             <>
               <SectionCostoNostro risultati={risultati} miglior={miglior!} />
-              {inputUsato?.deposito && (
+              {depositoCercato && (
                 <SectionCostoCliente
                   miglior={miglior!}
-                  deposito={inputUsato.deposito}
+                  depositoCercato={depositoCercato}
                   cliente={cliente}
                   preventivo={preventivo}
                   setPreventivo={setPreventivo}
@@ -303,6 +301,86 @@ function EmptyState() {
           <p className="text-sm text-muted-foreground mt-1">
             Inserisci peso e regione, poi premi <span className="font-medium">Calcola</span>
           </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function VettoreCard({
+  r,
+  highlighted,
+  best,
+  title,
+  subtitle,
+  tone = "default",
+}: {
+  r: CalcolaTariffaResponse;
+  highlighted?: boolean;
+  best?: boolean;
+  title?: string;
+  subtitle?: string;
+  tone?: "default" | "primary";
+}) {
+  return (
+    <Card
+      className={cn(
+        "relative overflow-hidden transition",
+        highlighted && tone === "default"
+          ? "border-emerald-500/60 ring-2 ring-emerald-500/30 shadow-[0_8px_30px_-12px_rgba(16,185,129,0.45)]"
+          : highlighted && tone === "primary"
+            ? "border-primary/60 ring-2 ring-primary/30 shadow-[var(--shadow-md)]"
+            : "opacity-90",
+      )}
+    >
+      {best && (
+        <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-semibold px-2.5 py-1 rounded-bl-lg flex items-center gap-1 uppercase tracking-wide">
+          <Trophy className="h-3 w-3" />
+          Migliore
+        </div>
+      )}
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">{title ?? r.vettore}</CardTitle>
+        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1 flex-wrap">
+          {subtitle && (
+            <>
+              <span>{subtitle}</span>
+              <span>•</span>
+            </>
+          )}
+          <span>
+            Peso tass.{" "}
+            <span className="text-foreground font-medium">{r.peso_tassabile} kg</span>
+          </span>
+          <span>•</span>
+          <span>
+            €/q <span className="text-foreground font-medium">{r.tariffa_quintale.toFixed(2)}</span>
+          </span>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <div className="space-y-1.5">
+          {Object.entries(r.addebiti).map(([k, v]) => (
+            <div key={k} className="flex justify-between text-sm">
+              <span className="text-muted-foreground">{k}</span>
+              <span className="font-medium tabular-nums">{fmtEUR(v)}</span>
+            </div>
+          ))}
+        </div>
+        <Separator />
+        <div className="flex items-center justify-between pt-1">
+          <span className="text-xs uppercase tracking-wide text-muted-foreground font-medium">
+            Costo totale (IVA esclusa)
+          </span>
+          <span
+            className={cn(
+              "text-2xl font-bold tabular-nums",
+              highlighted && tone === "default" && "text-emerald-600",
+              highlighted && tone === "primary" && "text-primary",
+            )}
+          >
+            {fmtEUR(r.costo_totale)}
+          </span>
         </div>
       </CardContent>
     </Card>
@@ -338,62 +416,7 @@ function SectionCostoNostro({
         {risultati.map((r) => {
           const isBest = r.vettore === miglior.vettore;
           return (
-            <Card
-              key={r.vettore}
-              className={cn(
-                "relative overflow-hidden transition",
-                isBest
-                  ? "border-emerald-500/60 ring-2 ring-emerald-500/30 shadow-[0_8px_30px_-12px_rgba(16,185,129,0.45)]"
-                  : "opacity-90",
-              )}
-            >
-              {isBest && (
-                <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-semibold px-2.5 py-1 rounded-bl-lg flex items-center gap-1 uppercase tracking-wide">
-                  <Trophy className="h-3 w-3" />
-                  Migliore
-                </div>
-              )}
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">{r.vettore}</CardTitle>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                  <span>
-                    Peso tass.{" "}
-                    <span className="text-foreground font-medium">{r.peso_tassabile} kg</span>
-                  </span>
-                  <span>•</span>
-                  <span>
-                    €/q{" "}
-                    <span className="text-foreground font-medium">
-                      {r.tariffa_quintale.toFixed(2)}
-                    </span>
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="space-y-1.5">
-                  {Object.entries(r.addebiti).map(([k, v]) => (
-                    <div key={k} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{k}</span>
-                      <span className="font-medium tabular-nums">{fmtEUR(v)}</span>
-                    </div>
-                  ))}
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground font-medium">
-                    Costo totale
-                  </span>
-                  <span
-                    className={cn(
-                      "text-2xl font-bold tabular-nums",
-                      isBest ? "text-emerald-600" : "text-foreground",
-                    )}
-                  >
-                    {fmtEUR(r.costo_totale)}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+            <VettoreCard key={r.vettore} r={r} highlighted={isBest} best={isBest} />
           );
         })}
       </div>
@@ -403,25 +426,17 @@ function SectionCostoNostro({
 
 function SectionCostoCliente({
   miglior,
-  deposito,
+  depositoCercato,
   cliente,
   preventivo,
   setPreventivo,
 }: {
   miglior: CalcolaTariffaResponse;
-  deposito: string;
-  cliente: ReturnType<typeof calcolaCostoCliente>;
+  depositoCercato: string;
+  cliente: ReturnType<typeof calcolaCostoClienteDettaglio>;
   preventivo: string;
   setPreventivo: (v: string) => void;
 }) {
-  const prev = Number(preventivo);
-  const hasPreventivo = preventivo !== "" && !isNaN(prev) && prev > 0;
-  const importoUsato = hasPreventivo ? prev : cliente?.costoCliente ?? 0;
-  const margine = importoUsato - miglior.costo_totale;
-  const ricaricoPct =
-    miglior.costo_totale > 0 ? (margine / miglior.costo_totale) * 100 : 0;
-  const marginePct = importoUsato > 0 ? (margine / importoUsato) * 100 : 0;
-
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
@@ -432,8 +447,8 @@ function SectionCostoCliente({
           </h2>
           <p className="text-xs text-muted-foreground">
             Deposito{" "}
-            <span className="font-medium text-foreground">{deposito}</span>
-            {cliente && <> — {cliente.deposito}</>}
+            <span className="font-medium text-foreground">{depositoCercato}</span>
+            {cliente && <> — {cliente.deposito.nome}</>}
           </p>
         </div>
       </div>
@@ -443,76 +458,124 @@ function SectionCostoCliente({
           <CardContent className="py-8 text-center">
             <p className="text-sm text-muted-foreground">
               Codice deposito{" "}
-              <span className="font-mono font-medium">{deposito}</span> non trovato.
+              <span className="font-mono font-medium">{depositoCercato}</span> non trovato.
               <br />
               Codici demo disponibili: {Object.keys(DEPOSITI_MOCK).join(", ")}
             </p>
           </CardContent>
         </Card>
       ) : (
-        <Card className="shadow-[var(--shadow-md)] bg-[var(--gradient-soft)] border-primary/20">
-          <CardContent className="pt-6 space-y-5">
-            <div className="grid sm:grid-cols-3 gap-4">
-              <Stat
-                label="Costo a noi"
-                value={fmtEUR(miglior.costo_totale)}
-                sub={miglior.vettore}
-              />
-              <Stat
-                label="Costo al cliente"
-                value={fmtEUR(cliente.costoCliente)}
-                sub={`Listino +${cliente.markupPct}%`}
-                accent
-              />
-              <Stat
-                label="Importo applicato"
-                value={fmtEUR(importoUsato)}
-                sub={hasPreventivo ? "Da preventivo" : "Listino"}
-              />
-            </div>
+        <div className="space-y-4">
+          <VettoreCard
+            r={cliente.dettaglio}
+            title={`Listino cliente — ${cliente.deposito.nome}`}
+            subtitle={`Deposito ${cliente.deposito.codice}`}
+            highlighted
+            tone="primary"
+          />
 
-            <Separator />
-
-            <div className="grid sm:grid-cols-[1fr_auto_1fr] gap-4 items-end">
-              <div>
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground font-medium flex items-center gap-1.5">
-                  <TrendingUp className="h-3 w-3" />
-                  Preventivo personalizzato (€)
-                </Label>
-                <Input
-                  type="number"
-                  inputMode="decimal"
-                  className="mt-1.5 bg-background"
-                  placeholder={`Default ${fmtEUR(cliente.costoCliente)}`}
-                  value={preventivo}
-                  onChange={(e) => setPreventivo(e.target.value)}
-                />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  Cambia l'importo per ricalcolare margine e ricarico
-                </p>
-              </div>
-
-              <div className="hidden sm:block h-12 w-px bg-border self-center" />
-
-              <div className="grid grid-cols-2 gap-3">
-                <MarginCard
-                  label="Margine"
-                  value={fmtEUR(margine)}
-                  pct={marginePct}
-                  positive={margine >= 0}
-                />
-                <MarginCard
-                  label="Ricarico"
-                  value={`${ricaricoPct.toFixed(1)}%`}
-                  pct={ricaricoPct}
-                  positive={ricaricoPct >= 0}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          <MarginiPanel
+            costoNostro={miglior.costo_totale}
+            costoListino={cliente.dettaglio.costo_totale}
+            vettoreMiglior={miglior.vettore}
+            preventivo={preventivo}
+            setPreventivo={setPreventivo}
+          />
+        </div>
       )}
     </section>
+  );
+}
+
+function MarginiPanel({
+  costoNostro,
+  costoListino,
+  vettoreMiglior,
+  preventivo,
+  setPreventivo,
+}: {
+  costoNostro: number;
+  costoListino: number;
+  vettoreMiglior: string;
+  preventivo: string;
+  setPreventivo: (v: string) => void;
+}) {
+  const prev = Number(preventivo);
+  const hasPreventivo = preventivo !== "" && !isNaN(prev) && prev > 0;
+  const importoUsato = hasPreventivo ? prev : costoListino;
+  const margine = importoUsato - costoNostro;
+  const ricaricoPct = costoNostro > 0 ? (margine / costoNostro) * 100 : 0;
+  const marginePct = importoUsato > 0 ? (margine / importoUsato) * 100 : 0;
+
+  return (
+    <Card className="shadow-[var(--shadow-md)] bg-[var(--gradient-soft)] border-primary/20">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-primary" />
+          Margini e ricarico
+        </CardTitle>
+        <CardDescription className="text-[11px]">
+          Tutti gli importi sono IVA esclusa
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <div className="grid sm:grid-cols-3 gap-3">
+          <Stat
+            label="Costo a noi"
+            value={fmtEUR(costoNostro)}
+            sub={vettoreMiglior}
+          />
+          <Stat label="Costo al cliente (listino)" value={fmtEUR(costoListino)} accent />
+          <Stat
+            label="Importo applicato"
+            value={fmtEUR(importoUsato)}
+            sub={hasPreventivo ? "Da preventivo" : "Listino"}
+          />
+        </div>
+
+        <Separator />
+
+        <div className="grid sm:grid-cols-[1fr_auto_1fr] gap-4 items-end">
+          <div>
+            <Label className="text-xs uppercase tracking-wide text-muted-foreground font-medium flex items-center gap-1.5">
+              <TrendingUp className="h-3 w-3" />
+              Preventivo personalizzato (€)
+            </Label>
+            <Input
+              type="number"
+              inputMode="decimal"
+              className="mt-1.5 bg-background"
+              placeholder={`Default ${fmtEUR(costoListino)}`}
+              value={preventivo}
+              onChange={(e) => setPreventivo(e.target.value)}
+            />
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Cambia l'importo per ricalcolare margine e ricarico
+            </p>
+          </div>
+
+          <div className="hidden sm:block h-12 w-px bg-border self-center" />
+
+          <div className="grid grid-cols-3 gap-2">
+            <MarginCard
+              label="Margine €"
+              value={fmtEUR(margine)}
+              positive={margine >= 0}
+            />
+            <MarginCard
+              label="Margine %"
+              value={`${marginePct.toFixed(1)}%`}
+              positive={marginePct >= 0}
+            />
+            <MarginCard
+              label="Ricarico %"
+              value={`${ricaricoPct.toFixed(1)}%`}
+              positive={ricaricoPct >= 0}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -552,7 +615,6 @@ function MarginCard({
 }: {
   label: string;
   value: string;
-  pct: number;
   positive: boolean;
 }) {
   return (
@@ -701,6 +763,3 @@ function RegioneCombobox({
     </div>
   );
 }
-
-// avoid unused warnings for pesoTassabile re-export possibility
-void pesoTassabile;
