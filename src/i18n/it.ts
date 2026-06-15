@@ -1,7 +1,7 @@
 // Stringhe i18n. Per ora solo italiano; struttura predisposta per multilingua.
 export const it = {
   app: {
-    name: "Web App Aziendale",
+    name: "Progetto Z Hub",
     tagline: "Gestione operativa",
   },
   common: {

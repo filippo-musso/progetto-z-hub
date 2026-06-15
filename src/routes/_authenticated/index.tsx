@@ -17,14 +17,19 @@ function HomePage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      <div className="relative overflow-hidden rounded-2xl bg-[var(--gradient-brand)] p-8 text-primary-foreground shadow-[var(--shadow-glow)]">
-        <div className="absolute -top-16 -right-16 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-white/5 blur-2xl" />
-        <div className="relative">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+      <div
+        className="relative overflow-hidden rounded-2xl p-8 shadow-[var(--shadow-glow)]"
+        style={{ background: "var(--gradient-brand)" }}
+      >
+        <div className="absolute -top-16 -right-16 h-56 w-56 rounded-full bg-white/15 blur-2xl" />
+        <div className="absolute -bottom-20 -left-10 h-56 w-56 rounded-full bg-black/10 blur-2xl" />
+        <div className="relative text-white">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight drop-shadow-sm">
             Ciao{user?.profile.full_name ? `, ${user.profile.full_name.split(" ")[0]}` : ""} 👋
           </h1>
-          <p className="text-primary-foreground/80 mt-2">Benvenuto nella tua area di lavoro</p>
+          <p className="text-white/95 mt-2 font-medium drop-shadow-sm">
+            Benvenuto nella tua area di lavoro
+          </p>
         </div>
       </div>
 
