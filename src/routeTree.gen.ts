@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSupportoRouteImport } from './routes/_authenticated/supporto'
 import { Route as AuthenticatedFatturazioneRouteImport } from './routes/_authenticated/fatturazione'
+import { Route as AuthenticatedCostoTrasportoRouteImport } from './routes/_authenticated/costo-trasporto'
 import { Route as AuthenticatedAdminUtentiRouteImport } from './routes/_authenticated/admin/utenti'
 import { Route as AuthenticatedAdminSupportoRouteImport } from './routes/_authenticated/admin/supporto'
 
@@ -42,6 +43,12 @@ const AuthenticatedFatturazioneRoute =
     path: '/fatturazione',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCostoTrasportoRoute =
+  AuthenticatedCostoTrasportoRouteImport.update({
+    id: '/costo-trasporto',
+    path: '/costo-trasporto',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminUtentiRoute =
   AuthenticatedAdminUtentiRouteImport.update({
     id: '/admin/utenti',
@@ -58,6 +65,7 @@ const AuthenticatedAdminSupportoRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/costo-trasporto': typeof AuthenticatedCostoTrasportoRoute
   '/fatturazione': typeof AuthenticatedFatturazioneRoute
   '/supporto': typeof AuthenticatedSupportoRoute
   '/admin/supporto': typeof AuthenticatedAdminSupportoRoute
@@ -65,6 +73,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/costo-trasporto': typeof AuthenticatedCostoTrasportoRoute
   '/fatturazione': typeof AuthenticatedFatturazioneRoute
   '/supporto': typeof AuthenticatedSupportoRoute
   '/': typeof AuthenticatedIndexRoute
@@ -75,6 +84,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/costo-trasporto': typeof AuthenticatedCostoTrasportoRoute
   '/_authenticated/fatturazione': typeof AuthenticatedFatturazioneRoute
   '/_authenticated/supporto': typeof AuthenticatedSupportoRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -86,6 +96,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/costo-trasporto'
     | '/fatturazione'
     | '/supporto'
     | '/admin/supporto'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/costo-trasporto'
     | '/fatturazione'
     | '/supporto'
     | '/'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/costo-trasporto'
     | '/_authenticated/fatturazione'
     | '/_authenticated/supporto'
     | '/_authenticated/'
@@ -151,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFatturazioneRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/costo-trasporto': {
+      id: '/_authenticated/costo-trasporto'
+      path: '/costo-trasporto'
+      fullPath: '/costo-trasporto'
+      preLoaderRoute: typeof AuthenticatedCostoTrasportoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/utenti': {
       id: '/_authenticated/admin/utenti'
       path: '/admin/utenti'
@@ -169,6 +189,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCostoTrasportoRoute: typeof AuthenticatedCostoTrasportoRoute
   AuthenticatedFatturazioneRoute: typeof AuthenticatedFatturazioneRoute
   AuthenticatedSupportoRoute: typeof AuthenticatedSupportoRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -177,6 +198,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCostoTrasportoRoute: AuthenticatedCostoTrasportoRoute,
   AuthenticatedFatturazioneRoute: AuthenticatedFatturazioneRoute,
   AuthenticatedSupportoRoute: AuthenticatedSupportoRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
