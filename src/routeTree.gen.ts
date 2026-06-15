@@ -13,7 +13,6 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSupportoRouteImport } from './routes/_authenticated/supporto'
-import { Route as AuthenticatedNuovoCostoTrasportoRouteImport } from './routes/_authenticated/nuovo-costo-trasporto'
 import { Route as AuthenticatedFatturazioneRouteImport } from './routes/_authenticated/fatturazione'
 import { Route as AuthenticatedAdminUtentiRouteImport } from './routes/_authenticated/admin/utenti'
 import { Route as AuthenticatedAdminSupportoRouteImport } from './routes/_authenticated/admin/supporto'
@@ -37,12 +36,6 @@ const AuthenticatedSupportoRoute = AuthenticatedSupportoRouteImport.update({
   path: '/supporto',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedNuovoCostoTrasportoRoute =
-  AuthenticatedNuovoCostoTrasportoRouteImport.update({
-    id: '/nuovo-costo-trasporto',
-    path: '/nuovo-costo-trasporto',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedFatturazioneRoute =
   AuthenticatedFatturazioneRouteImport.update({
     id: '/fatturazione',
@@ -66,7 +59,6 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/fatturazione': typeof AuthenticatedFatturazioneRoute
-  '/nuovo-costo-trasporto': typeof AuthenticatedNuovoCostoTrasportoRoute
   '/supporto': typeof AuthenticatedSupportoRoute
   '/admin/supporto': typeof AuthenticatedAdminSupportoRoute
   '/admin/utenti': typeof AuthenticatedAdminUtentiRoute
@@ -74,7 +66,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/fatturazione': typeof AuthenticatedFatturazioneRoute
-  '/nuovo-costo-trasporto': typeof AuthenticatedNuovoCostoTrasportoRoute
   '/supporto': typeof AuthenticatedSupportoRoute
   '/': typeof AuthenticatedIndexRoute
   '/admin/supporto': typeof AuthenticatedAdminSupportoRoute
@@ -85,7 +76,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/fatturazione': typeof AuthenticatedFatturazioneRoute
-  '/_authenticated/nuovo-costo-trasporto': typeof AuthenticatedNuovoCostoTrasportoRoute
   '/_authenticated/supporto': typeof AuthenticatedSupportoRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/supporto': typeof AuthenticatedAdminSupportoRoute
@@ -97,7 +87,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/fatturazione'
-    | '/nuovo-costo-trasporto'
     | '/supporto'
     | '/admin/supporto'
     | '/admin/utenti'
@@ -105,7 +94,6 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/fatturazione'
-    | '/nuovo-costo-trasporto'
     | '/supporto'
     | '/'
     | '/admin/supporto'
@@ -115,7 +103,6 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/fatturazione'
-    | '/_authenticated/nuovo-costo-trasporto'
     | '/_authenticated/supporto'
     | '/_authenticated/'
     | '/_authenticated/admin/supporto'
@@ -157,13 +144,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSupportoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/nuovo-costo-trasporto': {
-      id: '/_authenticated/nuovo-costo-trasporto'
-      path: '/nuovo-costo-trasporto'
-      fullPath: '/nuovo-costo-trasporto'
-      preLoaderRoute: typeof AuthenticatedNuovoCostoTrasportoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/fatturazione': {
       id: '/_authenticated/fatturazione'
       path: '/fatturazione'
@@ -190,7 +170,6 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedFatturazioneRoute: typeof AuthenticatedFatturazioneRoute
-  AuthenticatedNuovoCostoTrasportoRoute: typeof AuthenticatedNuovoCostoTrasportoRoute
   AuthenticatedSupportoRoute: typeof AuthenticatedSupportoRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminSupportoRoute: typeof AuthenticatedAdminSupportoRoute
@@ -199,7 +178,6 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFatturazioneRoute: AuthenticatedFatturazioneRoute,
-  AuthenticatedNuovoCostoTrasportoRoute: AuthenticatedNuovoCostoTrasportoRoute,
   AuthenticatedSupportoRoute: AuthenticatedSupportoRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminSupportoRoute: AuthenticatedAdminSupportoRoute,
