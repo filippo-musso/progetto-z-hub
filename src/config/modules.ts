@@ -8,6 +8,7 @@ import {
   LifeBuoy,
   Users,
   Inbox,
+  Truck,
   type LucideIcon,
 } from "lucide-react";
 import type { AppRole } from "@/types/auth";
@@ -33,6 +34,14 @@ export const MODULES: ModuleDef[] = [
     description: "Genera fatture per periodo e deposito",
     icon: FileText,
     to: "/fatturazione",
+    status: "active",
+  },
+  {
+    id: "nuovo-costo-trasporto",
+    label: "Nuovo costo trasporto",
+    description: "Calcola il costo di un trasporto per regione e deposito",
+    icon: Truck,
+    to: "/nuovo-costo-trasporto",
     status: "active",
   },
   {
