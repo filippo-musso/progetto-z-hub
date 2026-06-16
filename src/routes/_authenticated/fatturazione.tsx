@@ -828,6 +828,54 @@ function AdditionalChargesTab() {
   );
 }
 
+function ChargesByDeposit({ items }: { items: AdditionalCharge[] }) {
+  const byDep = useMemo(() => {
+    const m = new Map<string, AdditionalCharge[]>();
+    for (const c of items) {
+      const k = c.deposit_number || "(senza deposito)";
+      if (!m.has(k)) m.set(k, []);
+      m.get(k)!.push(c);
+    }
+    return Array.from(m.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [items]);
+
+  return (
+    <div className="space-y-3 pt-1">
+      {byDep.map(([dep, list]) => {
+        const subtotal = list.reduce(
+          (s, c) => s + (c.sign === "credit" ? -c.total : c.total),
+          0,
+        );
+        return (
+          <div key={dep} className="rounded-md border bg-card overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 bg-muted/40 border-b">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="font-mono">Dep. {dep}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {list.length} voc{list.length === 1 ? "e" : "i"}
+                </span>
+              </div>
+              <div
+                className={cn(
+                  "font-mono font-semibold text-sm",
+                  subtotal < 0 && "text-emerald-600 dark:text-emerald-400",
+                )}
+              >
+                € {subtotal.toFixed(2)}
+              </div>
+            </div>
+            <div className="divide-y">
+              {list.map((c) => (
+                <EditableChargeRow key={c.id} charge={c} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function EditableChargeRow({ charge }: { charge: AdditionalCharge }) {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
