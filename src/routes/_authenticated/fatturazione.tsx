@@ -415,8 +415,8 @@ function ChargeRowReadonly({ c }: { c: AdditionalCharge }) {
           </Badge>
         )}
       </div>
-      <div className="col-span-4 font-medium truncate">{c.item}</div>
-      <div className="col-span-1 text-xs text-right font-mono">{Number(c.quantity)} × € {Number(c.unit_price).toFixed(2)}</div>
+      <div className="col-span-3 font-medium truncate">{c.item}</div>
+      <div className="col-span-2 text-xs text-right font-mono whitespace-nowrap text-muted-foreground">{Number(c.quantity)} × € {Number(c.unit_price).toFixed(2)}</div>
       <div className="col-span-1 text-right">
         {c.istat ? (
           <Badge variant="outline" className="text-[10px]">ISTAT</Badge>
