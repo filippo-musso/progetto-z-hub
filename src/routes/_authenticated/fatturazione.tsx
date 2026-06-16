@@ -447,7 +447,7 @@ function makeDraft(): DraftCharge {
     unit_price: 0,
     quantity: 1,
     total: 0,
-    istat: false,
+    istat: true,
     deposit_number: "",
     notes: null,
   };
