@@ -25,7 +25,7 @@ export type NewCharge = Omit<
   "id" | "user_id" | "created_at" | "updated_at"
 >;
 
-/** Voci di addebito mock (in futuro lette da tabella DB). */
+/** Voci di addebito di default (usate per il seed; la lista live è in DB). */
 export const CHARGE_ITEMS: string[] = [
   "Scansione",
   "Imballaggio",
@@ -43,6 +43,25 @@ export const CHARGE_ITEMS: string[] = [
   "Facchinaggio",
   "Sponda idraulica",
 ];
+
+export async function listChargeItems(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("charge_items" as never)
+    .select("name")
+    .order("name", { ascending: true });
+  if (error) throw error;
+  return ((data ?? []) as Array<{ name: string }>).map((r) => r.name);
+}
+
+export async function createChargeItem(name: string): Promise<string> {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("Nome vuoto");
+  const { error } = await supabase
+    .from("charge_items" as never)
+    .insert({ name: trimmed } as never);
+  if (error && !String(error.message).toLowerCase().includes("duplicate")) throw error;
+  return trimmed;
+}
 
 export async function listAdditionalCharges(opts?: {
   from?: string;
