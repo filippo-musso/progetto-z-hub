@@ -509,12 +509,12 @@ function PendingChargesEditor() {
         {drafts.length > 0 && (
           <div className="hidden lg:grid grid-cols-12 gap-2 text-[11px] uppercase font-semibold text-muted-foreground px-2">
             <div className="col-span-1">Tipo</div>
-            <div className="col-span-2">Data</div>
+            <div className="col-span-1">Data</div>
             <div className="col-span-1">Segno</div>
-            <div className="col-span-2">Voce</div>
+            <div className="col-span-3">Voce</div>
             <div className="col-span-1">P. unit. €</div>
             <div className="col-span-1">Q.tà</div>
-            <div className="col-span-1">Totale</div>
+            <div className="col-span-1 text-right">Totale €</div>
             <div className="col-span-1">ISTAT</div>
             <div className="col-span-1">Deposito</div>
             <div className="col-span-1"></div>
