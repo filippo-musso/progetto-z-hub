@@ -654,6 +654,27 @@ function ChargeRowEditor({
 function ItemCombobox({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
+  const { data: items = [] } = useQuery({
+    queryKey: ["charge-items"],
+    queryFn: () => listChargeItems(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (name: string) => createChargeItem(name),
+    onSuccess: (name) => {
+      toast.success(`Voce "${name}" creata`);
+      onChange(name);
+      setOpen(false);
+      setSearch("");
+      queryClient.invalidateQueries({ queryKey: ["charge-items"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Errore"),
+  });
+
+  const lcSearch = search.trim().toLowerCase();
+  const exactMatch = items.some((it) => it.toLowerCase() === lcSearch);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -669,29 +690,30 @@ function ItemCombobox({ value, onChange }: { value: string; onChange: (v: string
           <ChevronsUpDown className="h-3 w-3 opacity-50 shrink-0 ml-1" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-[240px] pointer-events-auto" align="start">
+      <PopoverContent className="p-0 w-[260px] pointer-events-auto" align="start">
         <Command>
           <CommandInput
-            placeholder="Cerca o digita..."
+            placeholder="Cerca o crea nuova..."
             value={search}
             onValueChange={setSearch}
           />
           <CommandList>
             <CommandEmpty>
-              <button
-                type="button"
-                className="text-sm text-primary hover:underline"
-                onClick={() => {
-                  onChange(search);
-                  setOpen(false);
-                  setSearch("");
-                }}
-              >
-                Usa "{search}"
-              </button>
+              {lcSearch ? (
+                <button
+                  type="button"
+                  className="text-sm text-primary hover:underline px-2 py-1"
+                  onClick={() => createMutation.mutate(search.trim())}
+                  disabled={createMutation.isPending}
+                >
+                  + Crea "{search.trim()}"
+                </button>
+              ) : (
+                <span className="text-xs text-muted-foreground">Nessuna voce</span>
+              )}
             </CommandEmpty>
             <CommandGroup>
-              {CHARGE_ITEMS.map((it) => (
+              {items.map((it) => (
                 <CommandItem
                   key={it}
                   value={it}
@@ -705,6 +727,16 @@ function ItemCombobox({ value, onChange }: { value: string; onChange: (v: string
                   {it}
                 </CommandItem>
               ))}
+              {lcSearch && !exactMatch && (
+                <CommandItem
+                  value={`__create_${search}`}
+                  onSelect={() => createMutation.mutate(search.trim())}
+                  className="text-primary"
+                >
+                  <Plus className="mr-2 h-3 w-3" />
+                  Crea "{search.trim()}"
+                </CommandItem>
+              )}
             </CommandGroup>
           </CommandList>
         </Command>
