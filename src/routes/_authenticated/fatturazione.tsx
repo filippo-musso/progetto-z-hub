@@ -12,7 +12,8 @@ import {
   createAdditionalCharges,
   updateAdditionalCharge,
   deleteAdditionalCharge,
-  CHARGE_ITEMS,
+  listChargeItems,
+  createChargeItem,
   type AdditionalCharge,
   type ChargeKind,
   type ChargeSign,
@@ -414,8 +415,8 @@ function ChargeRowReadonly({ c }: { c: AdditionalCharge }) {
           </Badge>
         )}
       </div>
-      <div className="col-span-4 font-medium truncate">{c.item}</div>
-      <div className="col-span-1 text-xs text-right font-mono">{Number(c.quantity)} × € {Number(c.unit_price).toFixed(2)}</div>
+      <div className="col-span-3 font-medium truncate">{c.item}</div>
+      <div className="col-span-2 text-xs text-right font-mono whitespace-nowrap text-muted-foreground">{Number(c.quantity)} × € {Number(c.unit_price).toFixed(2)}</div>
       <div className="col-span-1 text-right">
         {c.istat ? (
           <Badge variant="outline" className="text-[10px]">ISTAT</Badge>
@@ -446,7 +447,7 @@ function makeDraft(): DraftCharge {
     unit_price: 0,
     quantity: 1,
     total: 0,
-    istat: false,
+    istat: true,
     deposit_number: "",
     notes: null,
   };
@@ -508,12 +509,12 @@ function PendingChargesEditor() {
         {drafts.length > 0 && (
           <div className="hidden lg:grid grid-cols-12 gap-2 text-[11px] uppercase font-semibold text-muted-foreground px-2">
             <div className="col-span-1">Tipo</div>
-            <div className="col-span-2">Data</div>
+            <div className="col-span-1">Data</div>
             <div className="col-span-1">Segno</div>
-            <div className="col-span-2">Voce</div>
+            <div className="col-span-3">Voce</div>
             <div className="col-span-1">P. unit. €</div>
             <div className="col-span-1">Q.tà</div>
-            <div className="col-span-1">Totale</div>
+            <div className="col-span-1 text-right">Totale €</div>
             <div className="col-span-1">ISTAT</div>
             <div className="col-span-1">Deposito</div>
             <div className="col-span-1"></div>
@@ -578,12 +579,12 @@ function ChargeRowEditor({
           </SelectContent>
         </Select>
       </div>
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-1">
         <Input
           type="date"
           value={row.charge_date}
           onChange={(e) => onChange({ charge_date: e.target.value })}
-          className="h-9"
+          className="h-9 px-1.5 text-xs"
         />
       </div>
       <div className="lg:col-span-1">
@@ -595,7 +596,7 @@ function ChargeRowEditor({
           </SelectContent>
         </Select>
       </div>
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-3">
         <ItemCombobox value={row.item} onChange={(v) => onChange({ item: v })} />
       </div>
       <div className="lg:col-span-1">
@@ -618,18 +619,18 @@ function ChargeRowEditor({
       </div>
       <div className="lg:col-span-1">
         <div className="h-9 px-3 rounded-md border bg-muted/40 flex items-center justify-end font-mono text-sm font-semibold">
-          € {row.total.toFixed(2)}
+          {row.total.toFixed(2)}
         </div>
       </div>
       <div className="lg:col-span-1">
         <Select
-          value={row.istat ? "istat" : "no"}
-          onValueChange={(v) => onChange({ istat: v === "istat" })}
+          value={row.istat ? "si" : "no"}
+          onValueChange={(v) => onChange({ istat: v === "si" })}
         >
           <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="istat">ISTAT</SelectItem>
-            <SelectItem value="no">No ISTAT</SelectItem>
+            <SelectItem value="si">Sì</SelectItem>
+            <SelectItem value="no">No</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -653,6 +654,27 @@ function ChargeRowEditor({
 function ItemCombobox({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
+  const { data: items = [] } = useQuery({
+    queryKey: ["charge-items"],
+    queryFn: () => listChargeItems(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (name: string) => createChargeItem(name),
+    onSuccess: (name) => {
+      toast.success(`Voce "${name}" creata`);
+      onChange(name);
+      setOpen(false);
+      setSearch("");
+      queryClient.invalidateQueries({ queryKey: ["charge-items"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Errore"),
+  });
+
+  const lcSearch = search.trim().toLowerCase();
+  const exactMatch = items.some((it) => it.toLowerCase() === lcSearch);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -668,29 +690,30 @@ function ItemCombobox({ value, onChange }: { value: string; onChange: (v: string
           <ChevronsUpDown className="h-3 w-3 opacity-50 shrink-0 ml-1" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-[240px] pointer-events-auto" align="start">
+      <PopoverContent className="p-0 w-[260px] pointer-events-auto" align="start">
         <Command>
           <CommandInput
-            placeholder="Cerca o digita..."
+            placeholder="Cerca o crea nuova..."
             value={search}
             onValueChange={setSearch}
           />
           <CommandList>
             <CommandEmpty>
-              <button
-                type="button"
-                className="text-sm text-primary hover:underline"
-                onClick={() => {
-                  onChange(search);
-                  setOpen(false);
-                  setSearch("");
-                }}
-              >
-                Usa "{search}"
-              </button>
+              {lcSearch ? (
+                <button
+                  type="button"
+                  className="text-sm text-primary hover:underline px-2 py-1"
+                  onClick={() => createMutation.mutate(search.trim())}
+                  disabled={createMutation.isPending}
+                >
+                  + Crea "{search.trim()}"
+                </button>
+              ) : (
+                <span className="text-xs text-muted-foreground">Nessuna voce</span>
+              )}
             </CommandEmpty>
             <CommandGroup>
-              {CHARGE_ITEMS.map((it) => (
+              {items.map((it) => (
                 <CommandItem
                   key={it}
                   value={it}
@@ -704,6 +727,16 @@ function ItemCombobox({ value, onChange }: { value: string; onChange: (v: string
                   {it}
                 </CommandItem>
               ))}
+              {lcSearch && !exactMatch && (
+                <CommandItem
+                  value={`__create_${search}`}
+                  onSelect={() => createMutation.mutate(search.trim())}
+                  className="text-primary"
+                >
+                  <Plus className="mr-2 h-3 w-3" />
+                  Crea "{search.trim()}"
+                </CommandItem>
+              )}
             </CommandGroup>
           </CommandList>
         </Command>
@@ -784,11 +817,7 @@ function AdditionalChargesTab() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-1">
-                    {m.items.map((c) => (
-                      <EditableChargeRow key={c.id} charge={c} />
-                    ))}
-                  </div>
+                  <ChargesByDeposit items={m.items} />
                 </AccordionContent>
               </AccordionItem>
             );
@@ -796,6 +825,54 @@ function AdditionalChargesTab() {
         </Accordion>
       </CardContent>
     </Card>
+  );
+}
+
+function ChargesByDeposit({ items }: { items: AdditionalCharge[] }) {
+  const byDep = useMemo(() => {
+    const m = new Map<string, AdditionalCharge[]>();
+    for (const c of items) {
+      const k = c.deposit_number || "(senza deposito)";
+      if (!m.has(k)) m.set(k, []);
+      m.get(k)!.push(c);
+    }
+    return Array.from(m.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [items]);
+
+  return (
+    <div className="space-y-3 pt-1">
+      {byDep.map(([dep, list]) => {
+        const subtotal = list.reduce(
+          (s, c) => s + (c.sign === "credit" ? -c.total : c.total),
+          0,
+        );
+        return (
+          <div key={dep} className="rounded-md border bg-card overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 bg-muted/40 border-b">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="font-mono">Dep. {dep}</Badge>
+                <span className="text-xs text-muted-foreground">
+                  {list.length} voc{list.length === 1 ? "e" : "i"}
+                </span>
+              </div>
+              <div
+                className={cn(
+                  "font-mono font-semibold text-sm",
+                  subtotal < 0 && "text-emerald-600 dark:text-emerald-400",
+                )}
+              >
+                € {subtotal.toFixed(2)}
+              </div>
+            </div>
+            <div className="divide-y">
+              {list.map((c) => (
+                <EditableChargeRow key={c.id} charge={c} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
