@@ -161,12 +161,26 @@ function NewInvoicingForm() {
       setLogLines([]);
       setLogRunning(true);
       setLogOpen(true);
+
+      // Carica gli addebiti aggiuntivi presenti nel periodo
+      const charges = await listAdditionalCharges({
+        from: dateFrom,
+        to: dateTo,
+        depositNumber: depositNumber.trim() || undefined,
+      });
+
+      const mapped = charges.map((c) => ({
+        kind: c.kind as "transport" | "logistics",
+        description: `Dep.${c.deposit_number} · ${c.item} · ${c.charge_date} · ${c.quantity} × € ${Number(c.unit_price).toFixed(2)}${c.sign === "credit" ? " (storno)" : ""}${c.istat ? " [ISTAT]" : ""}`,
+        amount: c.sign === "credit" ? -Number(c.total) : Number(c.total),
+      }));
+
       const { done } = await startInvoicing(
         {
           dateFrom,
           dateTo,
           depositNumber: depositNumber.trim() || undefined,
-          charges: [],
+          charges: mapped,
         },
         (line) => setLogLines((prev) => [...prev, line]),
       );
