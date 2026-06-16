@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      additional_charges: {
+        Row: {
+          charge_date: string
+          created_at: string
+          deposit_number: string
+          id: string
+          istat: boolean
+          item: string
+          kind: string
+          notes: string | null
+          quantity: number
+          sign: string
+          total: number
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          charge_date: string
+          created_at?: string
+          deposit_number: string
+          id?: string
+          istat?: boolean
+          item: string
+          kind: string
+          notes?: string | null
+          quantity?: number
+          sign: string
+          total?: number
+          unit_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          charge_date?: string
+          created_at?: string
+          deposit_number?: string
+          id?: string
+          istat?: boolean
+          item?: string
+          kind?: string
+          notes?: string | null
+          quantity?: number
+          sign?: string
+          total?: number
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       invoicing_jobs: {
         Row: {
           completed_at: string | null
