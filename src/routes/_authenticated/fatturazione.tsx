@@ -579,12 +579,12 @@ function ChargeRowEditor({
           </SelectContent>
         </Select>
       </div>
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-1">
         <Input
           type="date"
           value={row.charge_date}
           onChange={(e) => onChange({ charge_date: e.target.value })}
-          className="h-9"
+          className="h-9 px-1.5 text-xs"
         />
       </div>
       <div className="lg:col-span-1">
@@ -596,7 +596,7 @@ function ChargeRowEditor({
           </SelectContent>
         </Select>
       </div>
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-3">
         <ItemCombobox value={row.item} onChange={(v) => onChange({ item: v })} />
       </div>
       <div className="lg:col-span-1">
@@ -619,18 +619,18 @@ function ChargeRowEditor({
       </div>
       <div className="lg:col-span-1">
         <div className="h-9 px-3 rounded-md border bg-muted/40 flex items-center justify-end font-mono text-sm font-semibold">
-          € {row.total.toFixed(2)}
+          {row.total.toFixed(2)}
         </div>
       </div>
       <div className="lg:col-span-1">
         <Select
-          value={row.istat ? "istat" : "no"}
-          onValueChange={(v) => onChange({ istat: v === "istat" })}
+          value={row.istat ? "si" : "no"}
+          onValueChange={(v) => onChange({ istat: v === "si" })}
         >
           <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="istat">ISTAT</SelectItem>
-            <SelectItem value="no">No ISTAT</SelectItem>
+            <SelectItem value="si">Sì</SelectItem>
+            <SelectItem value="no">No</SelectItem>
           </SelectContent>
         </Select>
       </div>
