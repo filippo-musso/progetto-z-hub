@@ -817,11 +817,7 @@ function AdditionalChargesTab() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-1">
-                    {m.items.map((c) => (
-                      <EditableChargeRow key={c.id} charge={c} />
-                    ))}
-                  </div>
+                  <ChargesByDeposit items={m.items} />
                 </AccordionContent>
               </AccordionItem>
             );
