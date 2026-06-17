@@ -15,6 +15,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSupportoRouteImport } from './routes/_authenticated/supporto'
 import { Route as AuthenticatedFatturazioneRouteImport } from './routes/_authenticated/fatturazione'
 import { Route as AuthenticatedCostoTrasportoRouteImport } from './routes/_authenticated/costo-trasporto'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminUtentiRouteImport } from './routes/_authenticated/admin/utenti'
 import { Route as AuthenticatedAdminSupportoRouteImport } from './routes/_authenticated/admin/supporto'
 
@@ -49,22 +50,28 @@ const AuthenticatedCostoTrasportoRoute =
     path: '/costo-trasporto',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminUtentiRoute =
   AuthenticatedAdminUtentiRouteImport.update({
-    id: '/admin/utenti',
-    path: '/admin/utenti',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/utenti',
+    path: '/utenti',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminSupportoRoute =
   AuthenticatedAdminSupportoRouteImport.update({
-    id: '/admin/supporto',
-    path: '/admin/supporto',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/supporto',
+    path: '/supporto',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/costo-trasporto': typeof AuthenticatedCostoTrasportoRoute
   '/fatturazione': typeof AuthenticatedFatturazioneRoute
   '/supporto': typeof AuthenticatedSupportoRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/costo-trasporto': typeof AuthenticatedCostoTrasportoRoute
   '/fatturazione': typeof AuthenticatedFatturazioneRoute
   '/supporto': typeof AuthenticatedSupportoRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/costo-trasporto': typeof AuthenticatedCostoTrasportoRoute
   '/_authenticated/fatturazione': typeof AuthenticatedFatturazioneRoute
   '/_authenticated/supporto': typeof AuthenticatedSupportoRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/admin'
     | '/costo-trasporto'
     | '/fatturazione'
     | '/supporto'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/admin'
     | '/costo-trasporto'
     | '/fatturazione'
     | '/supporto'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/admin'
     | '/_authenticated/costo-trasporto'
     | '/_authenticated/fatturazione'
     | '/_authenticated/supporto'
@@ -171,39 +183,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCostoTrasportoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/utenti': {
       id: '/_authenticated/admin/utenti'
-      path: '/admin/utenti'
+      path: '/utenti'
       fullPath: '/admin/utenti'
       preLoaderRoute: typeof AuthenticatedAdminUtentiRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/supporto': {
       id: '/_authenticated/admin/supporto'
-      path: '/admin/supporto'
+      path: '/supporto'
       fullPath: '/admin/supporto'
       preLoaderRoute: typeof AuthenticatedAdminSupportoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedCostoTrasportoRoute: typeof AuthenticatedCostoTrasportoRoute
-  AuthenticatedFatturazioneRoute: typeof AuthenticatedFatturazioneRoute
-  AuthenticatedSupportoRoute: typeof AuthenticatedSupportoRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminSupportoRoute: typeof AuthenticatedAdminSupportoRoute
   AuthenticatedAdminUtentiRoute: typeof AuthenticatedAdminUtentiRoute
 }
 
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminSupportoRoute: AuthenticatedAdminSupportoRoute,
+    AuthenticatedAdminUtentiRoute: AuthenticatedAdminUtentiRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedCostoTrasportoRoute: typeof AuthenticatedCostoTrasportoRoute
+  AuthenticatedFatturazioneRoute: typeof AuthenticatedFatturazioneRoute
+  AuthenticatedSupportoRoute: typeof AuthenticatedSupportoRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedCostoTrasportoRoute: AuthenticatedCostoTrasportoRoute,
   AuthenticatedFatturazioneRoute: AuthenticatedFatturazioneRoute,
   AuthenticatedSupportoRoute: AuthenticatedSupportoRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedAdminSupportoRoute: AuthenticatedAdminSupportoRoute,
-  AuthenticatedAdminUtentiRoute: AuthenticatedAdminUtentiRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -216,13 +249,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
