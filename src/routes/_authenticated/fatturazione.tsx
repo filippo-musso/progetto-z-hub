@@ -521,17 +521,17 @@ function PendingChargesEditor() {
         )}
 
         {drafts.length > 0 && (
-          <div className="hidden lg:grid grid-cols-12 gap-2 text-[11px] uppercase font-semibold text-muted-foreground px-2">
-            <div className="col-span-1">Tipo</div>
-            <div className="col-span-1">Data</div>
-            <div className="col-span-1">Segno</div>
-            <div className="col-span-3">Voce</div>
-            <div className="col-span-1">P. unit. €</div>
-            <div className="col-span-1">Q.tà</div>
-            <div className="col-span-1 text-right">Totale €</div>
-            <div className="col-span-1">ISTAT</div>
-            <div className="col-span-1">Deposito</div>
-            <div className="col-span-1"></div>
+          <div className="hidden lg:grid grid-cols-[100px_110px_110px_1fr_90px_80px_100px_80px_100px_44px] gap-2 text-[11px] uppercase font-semibold text-muted-foreground px-2">
+            <div>Tipo</div>
+            <div>Data</div>
+            <div>Segno</div>
+            <div>Voce</div>
+            <div className="text-right">P. unit.</div>
+            <div className="text-right">Q.tà</div>
+            <div className="text-right">Totale</div>
+            <div className="text-center">ISTAT</div>
+            <div>Deposito</div>
+            <div></div>
           </div>
         )}
 
