@@ -521,17 +521,17 @@ function PendingChargesEditor() {
         )}
 
         {drafts.length > 0 && (
-          <div className="hidden lg:grid grid-cols-12 gap-2 text-[11px] uppercase font-semibold text-muted-foreground px-2">
-            <div className="col-span-1">Tipo</div>
-            <div className="col-span-1">Data</div>
-            <div className="col-span-1">Segno</div>
-            <div className="col-span-3">Voce</div>
-            <div className="col-span-1">P. unit. €</div>
-            <div className="col-span-1">Q.tà</div>
-            <div className="col-span-1 text-right">Totale €</div>
-            <div className="col-span-1">ISTAT</div>
-            <div className="col-span-1">Deposito</div>
-            <div className="col-span-1"></div>
+          <div className="hidden lg:grid grid-cols-[100px_110px_110px_1fr_90px_80px_100px_80px_100px_44px] gap-2 text-[11px] uppercase font-semibold text-muted-foreground px-2">
+            <div>Tipo</div>
+            <div>Data</div>
+            <div>Segno</div>
+            <div>Voce</div>
+            <div className="text-right">P. unit.</div>
+            <div className="text-right">Q.tà</div>
+            <div className="text-right">Totale</div>
+            <div className="text-center">ISTAT</div>
+            <div>Deposito</div>
+            <div></div>
           </div>
         )}
 
@@ -583,17 +583,17 @@ function ChargeRowEditor({
   onRemove: () => void;
 }) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-12 gap-2 items-center p-2 rounded-md border bg-card">
-      <div className="lg:col-span-1">
+    <div className="grid grid-cols-2 lg:grid-cols-[100px_110px_110px_1fr_90px_80px_100px_80px_100px_44px] gap-2 items-center p-2 rounded-md border bg-card">
+      <div>
         <Select value={row.kind} onValueChange={(v) => onChange({ kind: v as ChargeKind })}>
-          <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="transport">Trasporto</SelectItem>
             <SelectItem value="logistics">Logistica</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      <div className="lg:col-span-1">
+      <div>
         <Input
           type="date"
           value={row.charge_date}
@@ -601,63 +601,63 @@ function ChargeRowEditor({
           className="h-9 px-1.5 text-xs"
         />
       </div>
-      <div className="lg:col-span-1">
+      <div>
         <Select value={row.sign} onValueChange={(v) => onChange({ sign: v as ChargeSign })}>
-          <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="debit">Addebito</SelectItem>
             <SelectItem value="credit">Storno</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      <div className="lg:col-span-3">
+      <div className="col-span-2 lg:col-span-1">
         <ItemCombobox value={row.item} onChange={(v) => onChange({ item: v })} />
       </div>
-      <div className="lg:col-span-1">
+      <div>
         <Input
           type="number"
           step="0.01"
           value={row.unit_price}
           onChange={(e) => onChange({ unit_price: Number(e.target.value) })}
-          className="h-9 text-right font-mono"
+          className="h-9 text-right font-mono text-xs"
         />
       </div>
-      <div className="lg:col-span-1">
+      <div>
         <Input
           type="number"
           step="0.01"
           value={row.quantity}
           onChange={(e) => onChange({ quantity: Number(e.target.value) })}
-          className="h-9 text-right font-mono"
+          className="h-9 text-right font-mono text-xs"
         />
       </div>
-      <div className="lg:col-span-1">
+      <div>
         <div className="h-9 px-3 rounded-md border bg-muted/40 flex items-center justify-end font-mono text-sm font-semibold">
           {row.total.toFixed(2)}
         </div>
       </div>
-      <div className="lg:col-span-1">
+      <div>
         <Select
           value={row.istat ? "si" : "no"}
           onValueChange={(v) => onChange({ istat: v === "si" })}
         >
-          <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-9 text-xs justify-center"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="si">Sì</SelectItem>
             <SelectItem value="no">No</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      <div className="lg:col-span-1">
+      <div>
         <Input
           placeholder="Dep."
           value={row.deposit_number}
           onChange={(e) => onChange({ deposit_number: e.target.value })}
-          className="h-9 font-mono"
+          className="h-9 font-mono text-xs"
         />
       </div>
-      <div className="lg:col-span-1 flex justify-end">
-        <Button type="button" size="icon" variant="ghost" onClick={onRemove}>
+      <div className="flex justify-end">
+        <Button type="button" variant="ghost" onClick={onRemove} className="h-8 w-8 p-0">
           <Trash2 className="h-4 w-4 text-destructive" />
         </Button>
       </div>
