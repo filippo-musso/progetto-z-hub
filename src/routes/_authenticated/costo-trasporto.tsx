@@ -59,14 +59,14 @@ function CostoTrasportoPage() {
   const [risultati, setRisultati] = useState<CalcolaTariffaResponse[] | null>(null);
   const [cliente, setCliente] = useState<ReturnType<typeof calcolaCostoClienteDettaglio>>(null);
   const [depositoCercato, setDepositoCercato] = useState<string | null>(null);
-  const [preventivo, setPreventivo] = useState<string>("");
+  const [preventivo, setPreventivo] = useState<number | null>(null);
 
-  const canCalc = peso && Number(peso) > 0 && regione;
+  const canCalc = peso !== null && peso > 0 && regione;
 
   function handleCalc() {
     if (!canCalc) return;
     const input = {
-      pesoKg: Number(peso),
+      pesoKg: peso as number,
       regione: regione as Regione,
       cap: cap || undefined,
       localita: localita || undefined,
@@ -78,7 +78,7 @@ function CostoTrasportoPage() {
     setRisultati(r);
     setCliente(calcolaCostoClienteDettaglio(input));
     setDepositoCercato(codiceDeposito.trim() || null);
-    setPreventivo("");
+    setPreventivo(null);
   }
 
   const miglior = useMemo(() => {
