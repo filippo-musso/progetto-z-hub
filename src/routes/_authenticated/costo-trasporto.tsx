@@ -120,12 +120,10 @@ function CostoTrasportoPage() {
                 <Package className="h-3 w-3" />
                 Peso totale (kg)
               </Label>
-              <Input
-                type="number"
-                inputMode="decimal"
+              <NumberInput
                 placeholder="es. 250"
                 value={peso}
-                onChange={(e) => setPeso(e.target.value)}
+                onChange={setPeso}
                 className="text-base"
               />
             </div>
