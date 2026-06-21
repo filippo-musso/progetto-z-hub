@@ -22,6 +22,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -614,20 +615,16 @@ function ChargeRowEditor({
         <ItemCombobox value={row.item} onChange={(v) => onChange({ item: v })} />
       </div>
       <div>
-        <Input
-          type="number"
-          step="0.01"
+        <NumberInput
           value={row.unit_price}
-          onChange={(e) => onChange({ unit_price: Number(e.target.value) })}
+          onChange={(v) => onChange({ unit_price: v ?? 0 })}
           className="h-9 text-right font-mono text-xs"
         />
       </div>
       <div>
-        <Input
-          type="number"
-          step="0.01"
+        <NumberInput
           value={row.quantity}
-          onChange={(e) => onChange({ quantity: Number(e.target.value) })}
+          onChange={(v) => onChange({ quantity: v ?? 0 })}
           className="h-9 text-right font-mono text-xs"
         />
       </div>

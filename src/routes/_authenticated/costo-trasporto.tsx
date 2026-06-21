@@ -11,6 +11,7 @@ import {
 } from "@/services/transport";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/ui/number-input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,7 +39,7 @@ const fmtEUR = (n: number) =>
   n.toLocaleString("it-IT", { style: "currency", currency: "EUR" });
 
 function CostoTrasportoPage() {
-  const [peso, setPeso] = useState<string>("");
+  const [peso, setPeso] = useState<number | null>(null);
   const [regione, setRegione] = useState<Regione | "">("");
   const [cap, setCap] = useState("");
   const [localita, setLocalita] = useState("");
@@ -58,14 +59,14 @@ function CostoTrasportoPage() {
   const [risultati, setRisultati] = useState<CalcolaTariffaResponse[] | null>(null);
   const [cliente, setCliente] = useState<ReturnType<typeof calcolaCostoClienteDettaglio>>(null);
   const [depositoCercato, setDepositoCercato] = useState<string | null>(null);
-  const [preventivo, setPreventivo] = useState<string>("");
+  const [preventivo, setPreventivo] = useState<number | null>(null);
 
-  const canCalc = peso && Number(peso) > 0 && regione;
+  const canCalc = peso !== null && peso > 0 && regione;
 
   function handleCalc() {
     if (!canCalc) return;
     const input = {
-      pesoKg: Number(peso),
+      pesoKg: peso as number,
       regione: regione as Regione,
       cap: cap || undefined,
       localita: localita || undefined,
@@ -77,7 +78,7 @@ function CostoTrasportoPage() {
     setRisultati(r);
     setCliente(calcolaCostoClienteDettaglio(input));
     setDepositoCercato(codiceDeposito.trim() || null);
-    setPreventivo("");
+    setPreventivo(null);
   }
 
   const miglior = useMemo(() => {
@@ -119,12 +120,10 @@ function CostoTrasportoPage() {
                 <Package className="h-3 w-3" />
                 Peso totale (kg)
               </Label>
-              <Input
-                type="number"
-                inputMode="decimal"
+              <NumberInput
                 placeholder="es. 250"
                 value={peso}
-                onChange={(e) => setPeso(e.target.value)}
+                onChange={setPeso}
                 className="text-base"
               />
             </div>
@@ -233,17 +232,13 @@ function CostoTrasportoPage() {
                       <Label className="text-[11px] text-muted-foreground">
                         Valore da assicurare (€)
                       </Label>
-                      <Input
-                        type="number"
-                        inputMode="decimal"
+                      <NumberInput
                         placeholder="0,00"
-                        value={opzioni.valoreAssicurato ?? ""}
-                        onChange={(e) =>
+                        value={opzioni.valoreAssicurato ?? null}
+                        onChange={(v) =>
                           setOpzioni((o) => ({
                             ...o,
-                            valoreAssicurato: e.target.value
-                              ? Number(e.target.value)
-                              : undefined,
+                            valoreAssicurato: v ?? undefined,
                           }))
                         }
                       />
@@ -434,8 +429,8 @@ function SectionCostoCliente({
   miglior: CalcolaTariffaResponse;
   depositoCercato: string;
   cliente: ReturnType<typeof calcolaCostoClienteDettaglio>;
-  preventivo: string;
-  setPreventivo: (v: string) => void;
+  preventivo: number | null;
+  setPreventivo: (v: number | null) => void;
 }) {
   return (
     <section>
@@ -497,12 +492,11 @@ function MarginiPanel({
   costoNostro: number;
   costoListino: number;
   vettoreMiglior: string;
-  preventivo: string;
-  setPreventivo: (v: string) => void;
+  preventivo: number | null;
+  setPreventivo: (v: number | null) => void;
 }) {
-  const prev = Number(preventivo);
-  const hasPreventivo = preventivo !== "" && !isNaN(prev) && prev > 0;
-  const importoUsato = hasPreventivo ? prev : costoListino;
+  const hasPreventivo = preventivo !== null && preventivo > 0;
+  const importoUsato = hasPreventivo ? (preventivo as number) : costoListino;
   const margine = importoUsato - costoNostro;
   const ricaricoPct = costoNostro > 0 ? (margine / costoNostro) * 100 : 0;
   const marginePct = importoUsato > 0 ? (margine / importoUsato) * 100 : 0;
@@ -541,13 +535,11 @@ function MarginiPanel({
               <TrendingUp className="h-3 w-3" />
               Preventivo personalizzato (€)
             </Label>
-            <Input
-              type="number"
-              inputMode="decimal"
+            <NumberInput
               className="mt-1.5 bg-background"
               placeholder={`Default ${fmtEUR(costoListino)}`}
               value={preventivo}
-              onChange={(e) => setPreventivo(e.target.value)}
+              onChange={setPreventivo}
             />
             <p className="text-[11px] text-muted-foreground mt-1">
               Cambia l'importo per ricalcolare margine e ricarico
