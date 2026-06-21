@@ -498,12 +498,11 @@ function MarginiPanel({
   costoNostro: number;
   costoListino: number;
   vettoreMiglior: string;
-  preventivo: string;
-  setPreventivo: (v: string) => void;
+  preventivo: number | null;
+  setPreventivo: (v: number | null) => void;
 }) {
-  const prev = Number(preventivo);
-  const hasPreventivo = preventivo !== "" && !isNaN(prev) && prev > 0;
-  const importoUsato = hasPreventivo ? prev : costoListino;
+  const hasPreventivo = preventivo !== null && preventivo > 0;
+  const importoUsato = hasPreventivo ? (preventivo as number) : costoListino;
   const margine = importoUsato - costoNostro;
   const ricaricoPct = costoNostro > 0 ? (margine / costoNostro) * 100 : 0;
   const marginePct = importoUsato > 0 ? (margine / importoUsato) * 100 : 0;
