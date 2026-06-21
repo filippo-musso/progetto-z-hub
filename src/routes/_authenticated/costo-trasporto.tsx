@@ -232,17 +232,13 @@ function CostoTrasportoPage() {
                       <Label className="text-[11px] text-muted-foreground">
                         Valore da assicurare (€)
                       </Label>
-                      <Input
-                        type="number"
-                        inputMode="decimal"
+                      <NumberInput
                         placeholder="0,00"
-                        value={opzioni.valoreAssicurato ?? ""}
-                        onChange={(e) =>
+                        value={opzioni.valoreAssicurato ?? null}
+                        onChange={(v) =>
                           setOpzioni((o) => ({
                             ...o,
-                            valoreAssicurato: e.target.value
-                              ? Number(e.target.value)
-                              : undefined,
+                            valoreAssicurato: v ?? undefined,
                           }))
                         }
                       />
