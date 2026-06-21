@@ -535,13 +535,11 @@ function MarginiPanel({
               <TrendingUp className="h-3 w-3" />
               Preventivo personalizzato (€)
             </Label>
-            <Input
-              type="number"
-              inputMode="decimal"
+            <NumberInput
               className="mt-1.5 bg-background"
               placeholder={`Default ${fmtEUR(costoListino)}`}
               value={preventivo}
-              onChange={(e) => setPreventivo(e.target.value)}
+              onChange={setPreventivo}
             />
             <p className="text-[11px] text-muted-foreground mt-1">
               Cambia l'importo per ricalcolare margine e ricarico
