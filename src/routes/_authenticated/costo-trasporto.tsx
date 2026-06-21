@@ -435,8 +435,8 @@ function SectionCostoCliente({
   miglior: CalcolaTariffaResponse;
   depositoCercato: string;
   cliente: ReturnType<typeof calcolaCostoClienteDettaglio>;
-  preventivo: string;
-  setPreventivo: (v: string) => void;
+  preventivo: number | null;
+  setPreventivo: (v: number | null) => void;
 }) {
   return (
     <section>
