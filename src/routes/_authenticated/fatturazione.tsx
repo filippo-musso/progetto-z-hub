@@ -614,20 +614,16 @@ function ChargeRowEditor({
         <ItemCombobox value={row.item} onChange={(v) => onChange({ item: v })} />
       </div>
       <div>
-        <Input
-          type="number"
-          step="0.01"
+        <NumberInput
           value={row.unit_price}
-          onChange={(e) => onChange({ unit_price: Number(e.target.value) })}
+          onChange={(v) => onChange({ unit_price: v ?? 0 })}
           className="h-9 text-right font-mono text-xs"
         />
       </div>
       <div>
-        <Input
-          type="number"
-          step="0.01"
+        <NumberInput
           value={row.quantity}
-          onChange={(e) => onChange({ quantity: Number(e.target.value) })}
+          onChange={(v) => onChange({ quantity: v ?? 0 })}
           className="h-9 text-right font-mono text-xs"
         />
       </div>
