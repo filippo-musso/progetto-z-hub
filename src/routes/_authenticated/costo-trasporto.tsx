@@ -39,7 +39,7 @@ const fmtEUR = (n: number) =>
   n.toLocaleString("it-IT", { style: "currency", currency: "EUR" });
 
 function CostoTrasportoPage() {
-  const [peso, setPeso] = useState<string>("");
+  const [peso, setPeso] = useState<number | null>(null);
   const [regione, setRegione] = useState<Regione | "">("");
   const [cap, setCap] = useState("");
   const [localita, setLocalita] = useState("");
