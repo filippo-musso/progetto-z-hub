@@ -108,7 +108,7 @@ function FatturazionePage() {
 
       <Tabs defaultValue="new">
         <TabsList>
-          <TabsTrigger value="new">Nuova fatturazione</TabsTrigger>
+          <TabsTrigger value="new">Fatturazione</TabsTrigger>
           <TabsTrigger value="charges">Addebiti aggiuntivi</TabsTrigger>
           <TabsTrigger value="history">Cronologia</TabsTrigger>
         </TabsList>
@@ -792,7 +792,7 @@ function AdditionalChargesTab() {
     return (
       <Card>
         <CardContent className="py-10 text-center text-muted-foreground">
-          Nessun addebito aggiuntivo. Aggiungili dalla scheda "Nuova fatturazione".
+          Nessun addebito aggiuntivo. Aggiungili dalla scheda "Fatturazione".
         </CardContent>
       </Card>
     );
