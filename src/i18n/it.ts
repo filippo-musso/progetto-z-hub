@@ -68,7 +68,7 @@ export const it = {
   },
   invoicing: {
     title: "Fatturazione",
-    newRun: "Nuova fatturazione",
+    newRun: "Fatturazione",
     dateFrom: "Data inizio",
     dateTo: "Data fine",
     deposit: "Numero deposito",
