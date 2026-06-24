@@ -153,6 +153,11 @@ function NewInvoicingForm() {
   const [logOpen, setLogOpen] = useState(false);
   const [logLines, setLogLines] = useState<string[]>([]);
   const [logRunning, setLogRunning] = useState(false);
+  const [progress, setProgress] = useState<{
+    percent: number;
+    message: string;
+    status: "elaborazione" | "completato" | "errore";
+  }>({ percent: 0, message: "In attesa...", status: "elaborazione" });
 
   // Addebiti caricati dal periodo
   const [loadedCharges, setLoadedCharges] = useState<AdditionalCharge[] | null>(null);
@@ -162,6 +167,7 @@ function NewInvoicingForm() {
       setLogLines([]);
       setLogRunning(true);
       setLogOpen(true);
+      setProgress({ percent: 0, message: "Avvio...", status: "elaborazione" });
 
       // Carica gli addebiti aggiuntivi presenti nel periodo
       const charges = await listAdditionalCharges({
@@ -183,20 +189,26 @@ function NewInvoicingForm() {
           depositNumber: depositNumber.trim() || undefined,
           charges: mapped,
         },
-        (line) => setLogLines((prev) => [...prev, line]),
+        {
+          onLog: (line) => setLogLines((prev) => [...prev, line]),
+          onProgress: (p) => setProgress(p),
+        },
       );
       await done;
     },
     onSuccess: () => {
       setLogRunning(false);
+      setProgress((p) => ({ ...p, percent: 100, status: "completato", message: "Elaborazione terminata" }));
       toast.success("Fatturazione completata");
       queryClient.invalidateQueries({ queryKey: ["invoicing-jobs"] });
     },
     onError: (e) => {
       setLogRunning(false);
+      setProgress((p) => ({ ...p, status: "errore", message: e instanceof Error ? e.message : "Errore" }));
       toast.error(e instanceof Error ? e.message : "Errore");
     },
   });
+
 
   const loadChargesMutation = useMutation({
     mutationFn: () =>
