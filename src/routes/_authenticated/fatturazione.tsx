@@ -1009,14 +1009,17 @@ function FloatingLogWindow({
   open,
   running,
   lines,
+  progress,
   onClose,
 }: {
   open: boolean;
   running: boolean;
   lines: string[];
+  progress: { percent: number; message: string; status: "elaborazione" | "completato" | "errore" };
   onClose: () => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [logExpanded, setLogExpanded] = useState(false);
   useEffect(() => {
     const el = scrollRef.current?.querySelector("[data-radix-scroll-area-viewport]");
     if (el) (el as HTMLElement).scrollTop = (el as HTMLElement).scrollHeight;
@@ -1024,29 +1027,46 @@ function FloatingLogWindow({
 
   if (!open) return null;
 
+  const pct = Math.max(0, Math.min(100, Math.round(progress.percent)));
+  const isError = progress.status === "errore";
+  const isDone = progress.status === "completato" && !running;
+
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-[min(560px,calc(100vw-3rem))] animate-in fade-in slide-in-from-bottom-4 duration-200">
-      <div className="rounded-xl border bg-card shadow-2xl overflow-hidden">
+    <div className="fixed bottom-6 right-6 z-50 w-[min(580px,calc(100vw-3rem))] animate-in fade-in slide-in-from-bottom-4 duration-200">
+      <div className="rounded-2xl border bg-card/95 backdrop-blur shadow-2xl overflow-hidden">
+        {/* Header */}
         <div
           className={cn(
-            "flex items-center justify-between gap-2 px-4 py-2.5 border-b",
-            "bg-gradient-to-r from-primary/10 to-primary/5",
+            "flex items-center justify-between gap-2 px-4 py-3 border-b",
+            "bg-gradient-to-r from-primary/10 via-primary/5 to-transparent",
           )}
         >
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="h-7 w-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className={cn(
+                "h-9 w-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm",
+                isError
+                  ? "bg-destructive text-destructive-foreground"
+                  : isDone
+                    ? "bg-green-500 text-white"
+                    : "bg-primary text-primary-foreground",
+              )}
+            >
               {running ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
+              ) : isError ? (
+                <X className="h-4 w-4" />
               ) : (
                 <CheckCircle2 className="h-4 w-4" />
               )}
             </div>
             <div className="min-w-0">
               <div className="text-sm font-semibold flex items-center gap-2">
-                <Terminal className="h-3.5 w-3.5" />
-                Log fatturazione
+                Fatturazione massiva
                 {running ? (
                   <Badge variant="outline" className="text-[10px] py-0">in corso</Badge>
+                ) : isError ? (
+                  <Badge variant="destructive" className="text-[10px] py-0">errore</Badge>
                 ) : (
                   <Badge className="text-[10px] py-0 bg-green-500/15 text-green-700 dark:text-green-300 border-green-500/30">
                     completata
@@ -1054,7 +1074,7 @@ function FloatingLogWindow({
                 )}
               </div>
               <div className="text-[11px] text-muted-foreground truncate">
-                Il log verrà salvato nella cronologia
+                {progress.message}
               </div>
             </div>
           </div>
@@ -1068,16 +1088,81 @@ function FloatingLogWindow({
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <ScrollArea ref={scrollRef} className="h-64 bg-zinc-950">
-          <pre className="text-xs font-mono whitespace-pre-wrap p-4 text-green-300 leading-relaxed">
-            {lines.length === 0 ? "In attesa..." : lines.join("\n")}
-            {running && <span className="inline-block w-2 h-3 bg-green-300 ml-0.5 animate-pulse" />}
-          </pre>
-        </ScrollArea>
+
+        {/* Progress bar */}
+        <div className="px-4 pt-4 pb-3">
+          <div className="flex items-baseline justify-between mb-2">
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
+              Avanzamento
+            </span>
+            <span
+              className={cn(
+                "text-2xl font-bold tabular-nums leading-none",
+                isError ? "text-destructive" : isDone ? "text-green-600 dark:text-green-400" : "text-primary",
+              )}
+            >
+              {pct}
+              <span className="text-sm font-medium text-muted-foreground ml-0.5">%</span>
+            </span>
+          </div>
+          <div className="relative h-2.5 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className={cn(
+                "absolute inset-y-0 left-0 rounded-full transition-[width] duration-500 ease-out",
+                isError
+                  ? "bg-destructive"
+                  : "bg-gradient-to-r from-primary via-primary to-primary/80",
+              )}
+              style={{ width: `${pct}%` }}
+            >
+              {running && !isError && (
+                <div
+                  className="absolute inset-0 rounded-full opacity-70"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent 0%, hsl(0 0% 100% / 0.5) 50%, transparent 100%)",
+                    backgroundSize: "200% 100%",
+                    animation: "shimmer 1.6s linear infinite",
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Toggle log */}
+        <div className="px-4 pb-3">
+          <button
+            type="button"
+            onClick={() => setLogExpanded((v) => !v)}
+            className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Terminal className="h-3 w-3" />
+            {logExpanded ? "Nascondi log dettagliato" : "Mostra log dettagliato"}
+            <ChevronsUpDown className="h-3 w-3" />
+          </button>
+        </div>
+
+        {logExpanded && (
+          <ScrollArea ref={scrollRef} className="h-56 bg-zinc-950 border-t">
+            <pre className="text-xs font-mono whitespace-pre-wrap p-4 text-green-300 leading-relaxed">
+              {lines.length === 0 ? "In attesa..." : lines.join("\n")}
+              {running && <span className="inline-block w-2 h-3 bg-green-300 ml-0.5 animate-pulse" />}
+            </pre>
+          </ScrollArea>
+        )}
       </div>
+
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
     </div>
   );
 }
+
 
 // ============== CRONOLOGIA ==============
 
