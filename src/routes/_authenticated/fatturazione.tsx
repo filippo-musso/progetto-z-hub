@@ -315,8 +315,10 @@ function NewInvoicingForm() {
         open={logOpen}
         running={logRunning}
         lines={logLines}
+        progress={progress}
         onClose={() => setLogOpen(false)}
       />
+
     </>
   );
 }
