@@ -1143,22 +1143,45 @@ function FloatingLogWindow({
           <button
             type="button"
             onClick={() => setLogExpanded((v) => !v)}
-            className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+            aria-expanded={logExpanded}
+            className="group flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             <Terminal className="h-3 w-3" />
-            {logExpanded ? "Nascondi log dettagliato" : "Mostra log dettagliato"}
-            <ChevronsUpDown className="h-3 w-3" />
+            <span className="relative overflow-hidden">
+              {logExpanded ? "Nascondi log dettagliato" : "Mostra log dettagliato"}
+            </span>
+            <ChevronsUpDown
+              className={cn(
+                "h-3 w-3 transition-transform duration-300 ease-out",
+                logExpanded && "rotate-180",
+              )}
+            />
           </button>
         </div>
 
-        {logExpanded && (
-          <ScrollArea ref={scrollRef} className="h-56 bg-zinc-950 border-t">
-            <pre className="text-xs font-mono whitespace-pre-wrap p-4 text-green-300 leading-relaxed">
-              {lines.length === 0 ? "In attesa..." : lines.join("\n")}
-              {running && <span className="inline-block w-2 h-3 bg-green-300 ml-0.5 animate-pulse" />}
-            </pre>
-          </ScrollArea>
-        )}
+        <div
+          className={cn(
+            "grid border-t border-transparent transition-[grid-template-rows,border-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            logExpanded ? "grid-rows-[1fr] border-border" : "grid-rows-[0fr]",
+          )}
+        >
+          <div className="overflow-hidden">
+            <ScrollArea
+              ref={scrollRef}
+              className={cn(
+                "h-56 bg-zinc-950 transition-all duration-500 ease-out",
+                logExpanded ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2",
+              )}
+            >
+              <pre className="text-xs font-mono whitespace-pre-wrap p-4 text-green-300 leading-relaxed">
+                {lines.length === 0 ? "In attesa..." : lines.join("\n")}
+                {running && (
+                  <span className="inline-block w-2 h-3 bg-green-300 ml-0.5 animate-pulse" />
+                )}
+              </pre>
+            </ScrollArea>
+          </div>
+        </div>
       </div>
 
       <style>{`
@@ -1167,6 +1190,7 @@ function FloatingLogWindow({
           100% { background-position: -200% 0; }
         }
       `}</style>
+
     </div>
   );
 }
