@@ -1025,6 +1025,14 @@ function FloatingLogWindow({
     if (el) (el as HTMLElement).scrollTop = (el as HTMLElement).scrollHeight;
   }, [lines]);
 
+  // Auto-apri il log al termine se l'utente non l'ha già aperto
+  useEffect(() => {
+    if (!running && progress.status !== "elaborazione") {
+      setLogExpanded((v) => v || true);
+    }
+  }, [running, progress.status]);
+
+
   if (!open) return null;
 
   const pct = Math.max(0, Math.min(100, Math.round(progress.percent)));
